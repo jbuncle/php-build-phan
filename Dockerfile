@@ -1,8 +1,8 @@
 FROM php:alpine
 
 
-# Ast
-RUN apk add --no-cache gcc g++ make autoconf git \
+RUN apk add --no-cache gcc g++ make autoconf git subversion libzip-dev  zip \
+    # Instal PHP AST extension
     && git clone https://github.com/nikic/php-ast.git \
     && cd php-ast \
     && phpize \
@@ -11,14 +11,12 @@ RUN apk add --no-cache gcc g++ make autoconf git \
     && echo 'extension=ast.so' >/usr/local/etc/php/php.ini \
     && cd .. \
     && rm -rf php-ast \
-    && apk del gcc g++ make autoconf git \
+    # Remove unneeded packages
+    && apk del gcc g++ make autoconf \
     # ZLib
-    && apk add --no-cache \
-      libzip-dev \
-      zip \
     && docker-php-ext-install zip \
     # Composer & phan
-    && apk add  --no-cache composer && composer global require phan/phan
+    && apk add --no-cache composer && composer global require phan/phan
 
 # Add composer binaries to path
 ENV PATH=$PATH:/root/.composer/vendor/bin
